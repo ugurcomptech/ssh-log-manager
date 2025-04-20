@@ -133,8 +133,8 @@ Agent, SSH bağlantılarını izler ve merkezi sunucuya gönderir. Agent'ı çal
 
 ### Merkezi Sunucu (Log Server)
 
-- `merkezi.py`: Merkezi sunucuda çalışacak olan Flask uygulaması.
-- `log_roller.py`: Log dosyalarını işleyip kaydeden script.
+- `server.py`: Merkezi sunucuda çalışacak olan Flask uygulaması.
+- `agent.py`: Log dosyalarını işleyip kaydeden script.
 
 ### Agent
 
