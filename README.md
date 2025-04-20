@@ -1,5 +1,5 @@
 
-# Merkezî SSH Log Yönetim Sistemi (Agent-Client)
+# Merkezi SSH Log Yönetim Sistemi (Agent-Client)
 
 Bu proje, SSH loglarını merkezi bir sistemde toplayan bir Agent-Client yapısını içerir. SSH giriş ve çıkış başarıları, başarısız denemeler merkezi sunucuya gönderilir ve lokal olarak depolanır. Flask tabanlı merkezi sunucu, verileri alır ve günlük dosyasını oluşturur. Her bir agent, yerel logları takip eder ve başarı/başarısız giriş bilgilerini merkeze iletir.
 
