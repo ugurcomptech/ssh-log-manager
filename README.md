@@ -34,6 +34,7 @@ Merkezi sunucuyu başlatmak için, aşağıdaki adımları takip edin:
 2. **Sistemi Servis Olarak Çalıştırmak**
 
    Sistemi bir servis olarak çalıştırmak için `systemd` kullanabilirsiniz. Aşağıdaki adımları izleyin:
+   
 
    - `/etc/systemd/system/ssh-log-server.service` dosyasını oluşturun:
 
@@ -66,7 +67,7 @@ Merkezi sunucuyu başlatmak için, aşağıdaki adımları takip edin:
    sudo systemctl start ssh-log-server.service
    ```
 
-3. **Sunucu Durumunu Kontrol Etme**
+4. **Sunucu Durumunu Kontrol Etme**
 
    Sunucunun durumunu kontrol etmek için aşağıdaki komutu kullanabilirsiniz:
 
