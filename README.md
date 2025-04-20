@@ -33,6 +33,7 @@ Merkezi sunucuyu başlatmak için, aşağıdaki adımları takip edin:
 
 2. **Sistemi Servis Olarak Çalıştırmak**
 
+
    Sistemi bir servis olarak çalıştırmak için `systemd` kullanabilirsiniz. Aşağıdaki adımları izleyin:
    
 
