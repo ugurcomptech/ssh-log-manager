@@ -1,53 +1,148 @@
 
-# Merkezi SSH Log Yönetim Sistemi (Agent-Client)
+# Merkezi SSH Log Sistemi
 
-Bu proje, SSH loglarını merkezi bir sistemde toplayan bir Agent-Client yapısını içerir. SSH giriş ve çıkış başarıları, başarısız denemeler merkezi sunucuya gönderilir ve lokal olarak depolanır. Flask tabanlı merkezi sunucu, verileri alır ve günlük dosyasını oluşturur. Her bir agent, yerel logları takip eder ve başarı/başarısız giriş bilgilerini merkeze iletir.
+Bu proje, SSH bağlantı günlüklerini merkezi bir sunucuda toplamak amacıyla tasarlanmıştır. Hem **merkezi** hem de **agent** bileşenlerinden oluşan bir yapı ile, SSH bağlantı bilgileri merkezi sunucuya gönderilir.
 
-## Proje Bileşenleri
+## Bileşenler
+- **Merkezi Sunucu (Log Server):** SSH bağlantı bilgilerini alır, logları kaydeder ve günlükleri sıkıştırarak arşivler.
+- **Agent:** SSH giriş/çıkış bilgilerini izler ve merkezi sunucuya gönderir.
 
-1. **Merkezi Sunucu (Flask)**: SSH loglarını alır, işler ve günlükleri kaydeder.
-2. **Agent**: Yerel SSH loglarını okur, işlem yapar ve verileri merkezi sunucuya gönderir.
+## Gereksinimler
 
-## Kurulum ve Kullanım
+Bu proje için gerekli Python kütüphaneleri `requirements.txt` dosyasına dahil edilmiştir. Gerekli kütüphaneleri yüklemek için aşağıdaki komutu çalıştırabilirsiniz:
 
-### 1. Gereksinimler
-
-Aşağıdaki bağımlılıkları yüklemek için `requirements.txt` dosyasını kullanabilirsiniz:
-
-```bash
+```
 pip install -r requirements.txt
 ```
 
-### 2. Merkezi Sunucu (Server) Kurulumu
+## Kurulum
 
-- Flask uygulamasını çalıştırmak için, aşağıdaki komutla sunucuyu başlatın:
+### 1. Merkezi Sunucu
 
-```bash
-python3 server.py
-```
+Merkezi sunucuyu başlatmak için, aşağıdaki adımları takip edin:
 
-- Bu sunucu, yerel SSH giriş/çıkış loglarını alır ve `log` yoluna gönderir.
+1. **Flask Sunucusunu Başlatın**
 
-### 3. Agent Kurulumu
+   Flask tabanlı sunucu, SSH bağlantı günlüklerini alıp işlemektedir.
 
-- Agent, SSH loglarını sürekli takip eder ve başarılı/başarısız girişleri merkezi sunucuya gönderir.
-- Agent'ı çalıştırmak için:
+   `merkezi.py` dosyasını çalıştırarak sunucuyu başlatabilirsiniz.
 
-```bash
-python3 agent.py
-```
+   ```bash
+   python3 merkezi.py
+   ```
 
-### 4. Güvenlik
+2. **Sistemi Servis Olarak Çalıştırmak**
 
-- Yalnızca belirli IP'lerden gelen bağlantılara izin verilir.
-- Merkezî sunucu 5000 portu üzerinden JSON verisi alır.
+   Sistemi bir servis olarak çalıştırmak için `systemd` kullanabilirsiniz. Aşağıdaki adımları izleyin:
 
-## Kullanım Senaryoları
+   - `/etc/systemd/system/ssh-log-server.service` dosyasını oluşturun:
 
-- SSH girişleri ve başarısız girişler takip edilir.
-- Her bir başarılı/başarısız giriş, merkezi sunucuya iletilir.
-- Günlük dosyaları, tarih bazında depolanır ve analiz edilmek üzere arşivlenir.
+   ```bash
+   sudo nano /etc/systemd/system/ssh-log-server.service
+   ```
 
-## Katkıda Bulunma
+   - Aşağıdaki içeriği yapıştırın:
 
-Projenize katkı sağlamak isterseniz, pull request göndererek katkıda bulunabilirsiniz.
+   ```ini
+   [Unit]
+   Description=SSH Log Server
+   After=network.target
+
+   [Service]
+   ExecStart=/usr/bin/python3 /path/to/merkezi.py
+   WorkingDirectory=/path/to/your/project
+   User=your_user
+   Group=your_group
+   Restart=always
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+   - Servisi etkinleştirin ve başlatın:
+
+   ```bash
+   sudo systemctl enable ssh-log-server.service
+   sudo systemctl start ssh-log-server.service
+   ```
+
+3. **Sunucu Durumunu Kontrol Etme**
+
+   Sunucunun durumunu kontrol etmek için aşağıdaki komutu kullanabilirsiniz:
+
+   ```bash
+   sudo systemctl status ssh-log-server.service
+   ```
+
+### 2. Agent
+
+Agent, SSH bağlantılarını izler ve merkezi sunucuya gönderir. Agent'ı çalıştırmak için `agent.py` dosyasını kullanabilirsiniz.
+
+1. **Agent'ı Çalıştırın**
+
+   ```bash
+   python3 agent.py
+   ```
+
+2. **Agent'ı Servis Olarak Çalıştırmak**
+
+   `agent.py` dosyasını bir sistem servisi olarak çalıştırmak için aşağıdaki adımları izleyin:
+
+   - `/etc/systemd/system/ssh-log-agent.service` dosyasını oluşturun:
+
+   ```bash
+   sudo nano /etc/systemd/system/ssh-log-agent.service
+   ```
+
+   - Aşağıdaki içeriği yapıştırın:
+
+   ```ini
+   [Unit]
+   Description=SSH Log Agent
+   After=network.target
+
+   [Service]
+   ExecStart=/usr/bin/python3 /path/to/agent.py
+   WorkingDirectory=/path/to/your/project
+   User=your_user
+   Group=your_group
+   Restart=always
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+   - Servisi etkinleştirin ve başlatın:
+
+   ```bash
+   sudo systemctl enable ssh-log-agent.service
+   sudo systemctl start ssh-log-agent.service
+   ```
+
+3. **Agent Durumunu Kontrol Etme**
+
+   Agent servisini kontrol etmek için:
+
+   ```bash
+   sudo systemctl status ssh-log-agent.service
+   ```
+
+## Yapı
+
+### Merkezi Sunucu (Log Server)
+
+- `merkezi.py`: Merkezi sunucuda çalışacak olan Flask uygulaması.
+- `log_roller.py`: Log dosyalarını işleyip kaydeden script.
+
+### Agent
+
+- `agent.py`: SSH giriş/çıkış bağlantılarını izleyen ve merkezi sunucuya gönderen script.
+
+## Loglar
+
+- Merkezi sunucuda, günlükler `/var/log/ssh_<date>.log` dosyasına kaydedilir.
+- Eski loglar, belirli bir süre sonra sıkıştırılıp arşivlenir.
+
+---
+
+Bu proje, SSH giriş/çıkışları hakkında detaylı raporlama yaparak, güvenlik izleme ve analiz süreçlerinizi iyileştirmenize yardımcı olabilir.
