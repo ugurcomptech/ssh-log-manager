@@ -12,7 +12,7 @@ SSH_FAILURE_PATTERN = r"sshd\[[^\]]+\]: Failed"
 
 seen_entries = set()
 turkey_tz = pytz.timezone("Europe/Istanbul")
-SERVER_URL = "http://193.106.196.59:5000/log"  # BURAYA MERKEZİ SUNUCUNUN IP'SİNİ YAZ 
+SERVER_URL = "http://:5000/log"  # BURAYA MERKEZİ SUNUCUNUN IP'SİNİ YAZ 
 
 hostname = socket.gethostname()
 
